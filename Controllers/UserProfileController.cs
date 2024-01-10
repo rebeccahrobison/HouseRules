@@ -94,25 +94,58 @@ public class UserProfileController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    // [Authorize]
+    [Authorize]
     public IActionResult GetUserProfileById(int id)
     {
-      UserProfile foundUserProfile = _dbContext
-        .UserProfiles
-        // .Include(p => p.IdentityUser)
-        .Include(p => p.ChoreAssignments)
-          .ThenInclude(ca => ca.Chore)
-        .Include(p => p.ChoreCompletions)
-          .ThenInclude(cc => cc.Chore)
-        .SingleOrDefault(up => up.Id == id);
-      
-      if (foundUserProfile == null)
-      {
-        return NotFound();
-      }
+        UserProfile foundUserProfile = _dbContext
+          .UserProfiles
+          .Include(p => p.IdentityUser)
+          .Include(p => p.ChoreAssignments)
+            .ThenInclude(ca => ca.Chore)
+          .Include(p => p.ChoreCompletions)
+            .ThenInclude(cc => cc.Chore)
+          .SingleOrDefault(up => up.Id == id);
 
+        if (foundUserProfile == null)
+        {
+            return NotFound();
+        }
 
-    return Ok(foundUserProfile);
-
+        return Ok(new UserProfileDTO
+        {
+            Id = foundUserProfile.Id,
+            FirstName = foundUserProfile.FirstName,
+            LastName = foundUserProfile.LastName,
+            Address = foundUserProfile.Address,
+            Email = foundUserProfile.IdentityUser.Email,
+            UserName = foundUserProfile.IdentityUser.UserName,
+            ChoreAssignments = foundUserProfile.ChoreAssignments.Select(ca => new ChoreAssignmentDTO
+            {
+                Id = ca.Id,
+                UserProfileId = ca.UserProfileId,
+                ChoreId = ca.ChoreId,
+                Chore = new ChoreDTO
+                {
+                    Id = ca.Chore.Id,
+                    Name = ca.Chore.Name,
+                    Difficulty = ca.Chore.Difficulty,
+                    ChoreFrequencyDays = ca.Chore.ChoreFrequencyDays
+                }
+            }).ToList(),
+            ChoreCompletions = foundUserProfile.ChoreCompletions.Select(cc => new ChoreCompletionDTO
+            {
+                Id = cc.Id,
+                UserProfileId = cc.UserProfileId,
+                ChoreId = cc.ChoreId,
+                CompletedOn = cc.CompletedOn,
+                Chore = new ChoreDTO
+                {
+                    Id = cc.Chore.Id,
+                    Name = cc.Chore.Name,
+                    Difficulty = cc.Chore.Difficulty,
+                    ChoreFrequencyDays = cc.Chore.ChoreFrequencyDays
+                }
+            }).ToList()
+        });
     }
 }

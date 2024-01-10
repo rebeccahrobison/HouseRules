@@ -12,7 +12,6 @@ public class UserProfile
     public string LastName { get; set; }
     [Required]
     public string Address { get; set; }
-    [Required]
     public string IdentityUserId { get; set; }
 
     public IdentityUser IdentityUser { get; set; }

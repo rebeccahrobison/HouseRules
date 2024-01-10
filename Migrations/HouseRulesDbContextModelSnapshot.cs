@@ -291,7 +291,7 @@ namespace HouseRules.Migrations
                         new
                         {
                             Id = "c3aaeb97-d2ba-4a53-a521-4eea61e59b35",
-                            ConcurrencyStamp = "20c5f44f-7133-4fca-9a29-78c35f8ba1f4",
+                            ConcurrencyStamp = "c2f157e8-fee2-4ec7-bb32-b836e51d769f",
                             Name = "Admin",
                             NormalizedName = "admin"
                         });
@@ -390,13 +390,13 @@ namespace HouseRules.Migrations
                         {
                             Id = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "26d1cb24-cf8f-42f0-a4e0-49f6c8854d23",
+                            ConcurrencyStamp = "c6625dba-3877-4056-9f19-ed9585914bf4",
                             Email = "admina@strator.comx",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAEAACcQAAAAEC6cALMp9pyL/WMVR6P7Mzh3BW1P4Z3DIFSumHog81bWPALqhXefPkFp5HcB5HxCAg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEFUAliRbOVJcq4TMza4kVLjaZ4CLlQmiV62PhuIaLMOisRQR9rIQDDtW1+x2GLAR4A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ad1dec37-b6ce-4ced-adfb-71c5ab2b1978",
+                            SecurityStamp = "e8df903a-c821-4964-a316-039c43c6115d",
                             TwoFactorEnabled = false,
                             UserName = "Administrator"
                         });
@@ -493,7 +493,7 @@ namespace HouseRules.Migrations
             modelBuilder.Entity("HouseRules.Models.ChoreAssignment", b =>
                 {
                     b.HasOne("HouseRules.Models.Chore", "Chore")
-                        .WithMany()
+                        .WithMany("ChoreAssignments")
                         .HasForeignKey("ChoreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -592,6 +592,8 @@ namespace HouseRules.Migrations
 
             modelBuilder.Entity("HouseRules.Models.Chore", b =>
                 {
+                    b.Navigation("ChoreAssignments");
+
                     b.Navigation("ChoreCompletions");
                 });
 

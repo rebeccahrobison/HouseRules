@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { deleteChore, getChores } from "../../managers/choreManager"
+import { createChoreCompletion, deleteChore, getChores } from "../../managers/choreManager"
 import { Button, Table } from "reactstrap"
 import { Link, useNavigate } from "react-router-dom"
 
@@ -21,7 +21,7 @@ export const ChoresList = ({ loggedInUser }) => {
     e.preventDefault();
 
     console.log(id)
-    // deleteChore(id).then(() => getAndSetChores())
+    deleteChore(id).then(() => getAndSetChores())
   }
 
   const handleCreateNewChoreBtn = (e) => {
@@ -29,6 +29,37 @@ export const ChoresList = ({ loggedInUser }) => {
 
     navigate("create")
   }
+
+  const handleCompleteBtn = (e, choreId) => {
+    e.preventDefault()
+
+    // const userProfileId = loggedInUser.id
+    // console.log("choreId", choreId, "userProfileId", userProfileId)
+    const userProfileToSend = {
+      //id firstname lastname address identityuserid
+      id: loggedInUser.id,
+      firstName: loggedInUser.firstName,
+      lastName: loggedInUser.lastName,
+      address: loggedInUser.address,
+      identityUserId: loggedInUser.identityUserId,
+      choreAssignments: [],
+      choreCompletions: [],
+      identityUser: {}
+    }
+    createChoreCompletion(choreId, userProfileToSend)
+  }
+
+  const daysSinceLastCompletion = (completions) => {
+    if (!completions || completions.length === 0) {
+      // If there are no completions, assume a large number of days to always render in black
+      return 10000;
+    }
+  
+    const today = new Date();
+    const lastCompletionDate = new Date(Math.max(...completions.map(cc => new Date(cc.completedOn))));
+    const timeDifference = today - lastCompletionDate;
+    return Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+  };
 
   return (
     <>
@@ -41,17 +72,17 @@ export const ChoresList = ({ loggedInUser }) => {
             <th>Name</th>
             <th>Difficulty</th>
             <th>Frequency</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
           {chores.map((c) => (
-            <tr key={c.id}>
+            <tr key={c.id} >
               <th scope="row">{`${c.id}`}</th>
-              <td>{c.name}</td>
+              <td style={{ color: daysSinceLastCompletion(c.choreCompletions) > c.choreFrequencyDays ? "red" : "black" }}>{c.name}</td>
               <td>{c.difficulty}</td>
               <td>{c.choreFrequencyDays}</td>
               <td>
+                <Button color="info" onClick={e => handleCompleteBtn(e, c.id)}>Complete</Button>
                 {loggedInUser.roles.includes("Admin") ? (
                   <><Button
                     color="danger"
@@ -59,9 +90,10 @@ export const ChoresList = ({ loggedInUser }) => {
                   >
                     Delete
                   </Button>
-                  <Link to={`${c.id}`}>
-                    Details
-                  </Link></>
+                    <Link to={`${c.id}`}>
+                      Details
+                    </Link>
+                  </>
                 ) : (
                   ""
                 )}

@@ -1,0 +1,12 @@
+.chore-details {
+  display: flex;
+  justify-content: space-around;
+}
+
+.chore-details Label {
+  font-weight: 700;
+}
+
+.chore-details .assignee-label {
+  font-weight: 400;
+}
